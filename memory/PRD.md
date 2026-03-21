@@ -55,6 +55,10 @@
 
 ### P0 — Crítico
 - [x] Sistema de planos frontend — CONCLUÍDO
+- [x] IA Premium com chat financeiro — CONCLUÍDO
+- [x] Exportação PDF/Excel no Histórico — CONCLUÍDO
+- [x] Modal de confirmação antes de excluir — CONCLUÍDO
+- [x] Exclusão permanente no banco — VERIFICADO E FUNCIONANDO
 
 ### P1 — Alta Prioridade
 - [ ] Exportação PDF/Excel por período (Profissional/Premium)

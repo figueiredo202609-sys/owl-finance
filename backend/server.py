@@ -225,8 +225,8 @@ async def toggle_status(client_id: str, admin=Depends(require_admin)):
 async def get_admin_stats(admin=Depends(require_admin)):
     all_clients = await db.users.find({"role": "client"}).to_list(1000)
     active = [c for c in all_clients if c.get("status") == "active"]
-    plan_prices = {"Básico": 49.90, "Profissional": 99.90, "Premium": 199.90}
-    monthly_revenue = sum(plan_prices.get(c.get("plan_name", "Básico"), 49.90) for c in active)
+    plan_prices = {p["name"]: p["price"] for p in PLANS}
+    monthly_revenue = sum(plan_prices.get(c.get("plan_name", "Básico"), 69.90) for c in active)
 
     plan_dist = {"Básico": 0, "Profissional": 0, "Premium": 0}
     for c in all_clients:
