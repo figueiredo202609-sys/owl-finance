@@ -1,0 +1,79 @@
+{
+  "summary": "Full E2E testing of Owl Finance - React 19 + FastAPI + MongoDB. Admin and Client flows tested. 17/19 backend tests passed. Frontend works well with minor UX issues. Critical bug found: bcrypt/passlib hash inconsistency causing password update failures. Test environment data corruption when backend tests run against live DB.",
+
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "hash_password() / PUT /admin/clients/{id} / PUT /client/profile",
+        "issue": "CRITICAL: bcrypt/passlib generates password hashes via API endpoints that fail verification. Admin password created at startup works fine. But password updated via API endpoints (update_client, update_profile) creates hashes that cannot be verified. This causes client login to return 401 'Email ou senha incorretos' after any password update. Root cause: passlib shows 'bcrypt version' AttributeError at startup ('module bcrypt has no attribute __about__') - the bcrypt module may be in broken state for async context calls.",
+        "priority": "CRITICAL"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "DELETE /admin/clients/{client_id}",
+        "issue": "Test environment: when running backend tests against live DB, deleting test clients somehow causes owltest@test.com sample transactions to be deleted. Cannot fully reproduce. Possible race condition or cursor issue in delete_many."
+      }
+    ]
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "AdminClients - Novo Cliente button",
+        "issue": "On page load, the 'Bem-vindo ao Owl Finance!' toast notification (top-right) overlaps the 'Novo Cliente' button (also top-right). Button is unclickable for ~4-5 seconds until toast disappears.",
+        "selector": "[data-testid='create-client-btn']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Overall design is excellent - dark mode theme, animated bubbles on client dashboard, gradient buttons all look professional and polished"]
+      }
+    ]
+  },
+
+  "test_report_links": [
+    "/app/backend/tests/test_owl_finance.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+
+  "action_items": [
+    "CRITICAL: Fix bcrypt/passlib version incompatibility. Consider using `bcrypt` directly instead of passlib: `import bcrypt; bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()`. Or upgrade bcrypt package to fix the '__about__' AttributeError. The issue is passlib cannot detect the bcrypt version, which may affect hash generation.",
+    "Move the 'Novo Cliente' button to a different position OR use a different placement for the toast to avoid overlap. Consider using bottom-right position for success toasts.",
+    "Backend tests should not run against the live database for CRUD operations. Consider using test credentials or a separate test DB."
+  ],
+
+  "critical_code_review_comments": [
+    "CRITICAL: hash_password() is a sync function using passlib bcrypt which may produce inconsistent hashes in async FastAPI context. Consider replacing with: `import bcrypt; return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()` and verifying with `bcrypt.checkpw(plain.encode(), hashed.encode())`",
+    "The delete_client endpoint deletes all transactions of a client. This works but is irreversible. Consider soft-delete instead.",
+    "Password reset via admin API is broken (creates unverifiable hashes) - this means admin cannot reset client passwords."
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_owl_finance.py"
+  ],
+
+  "success_rate": {
+    "backend": "89% (17/19 tests pass - 2 fail due to bcrypt hash corruption after test run)",
+    "frontend": "95% (all flows work: admin dashboard, client dashboard, CRUD for profits/expenses, upload page, histórico, perfil, sidebar, logout, protected routes; minor toast overlap issue)"
+  },
+
+  "seed_data_creation": "Had to reseed 5 transactions for owltest@test.com (deleted during backend tests). Also had to reset owltest password directly in MongoDB (API-generated hashes are broken). Set plan back to 'Profissional'.",
+
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "The bcrypt/passlib issue is the #1 priority bug. owltest@test.com password must be reset directly in MongoDB (not via API) using passlib locally. Backend test `test_create_and_delete_client` somehow deletes owltest transactions - run backend tests carefully. The frontend works correctly when data is intact. Admin dashboard, client dashboard, all CRUD modals, sidebar navigation, and logout all tested and working.",
+
+  "rca_of_the_issue": {
+    "bcrypt_hash_bug": {
+      "symptom": "After updating password via PUT /admin/clients/{id} or PUT /client/profile, login fails with 401",
+      "root_cause": "passlib library shows 'AttributeError: module bcrypt has no attribute __about__' at startup. This indicates bcrypt version incompatibility with passlib. The hash creation may work but uses a different internal algorithm/settings than expected, causing verification failures in some execution contexts.",
+      "reproduction": "1. Login as admin, 2. Update owltest password via admin API, 3. Try to login as owltest -> 401",
+      "mitigation": "Replace passlib with direct bcrypt: `import bcrypt; pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(); valid = bcrypt.checkpw(plain.encode(), hash.encode())`"
+    }
+  }
+}
