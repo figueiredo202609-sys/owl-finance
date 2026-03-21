@@ -1,0 +1,101 @@
+{
+  "project_name": "Owl Finance",
+  "app_type": "saas_app",
+  "theme": "Light & Dark Mode Support (Dark Mode as Default to highlight the glowing bubbles)",
+  "language": "pt-BR",
+  "typography": {
+    "headings": "Manrope",
+    "body": "Inter",
+    "rules": "Use tracking-tight for headings > 32px. No 'Inter' for headings. Never default to 'Bold', use 'Light' or 'Black' for impact."
+  },
+  "colors": {
+    "palette_strategy": "Jewel & Luxury adapted for SaaS (Dark Blue Dominant, Neutral grays).",
+    "primary": "#0A1128",
+    "secondary": "#1E293B",
+    "accent_gradient": "bg-gradient-to-br from-[#7E22CE] to-[#1E3A8A]",
+    "backgrounds": {
+      "light": "#F8FAFC",
+      "dark": "#020617"
+    },
+    "text": {
+      "light": "#F8FAFC",
+      "dark": "#0F172A"
+    },
+    "bubble_theme": {
+      "base": "bg-gradient-to-br from-purple-600/80 to-blue-800/80",
+      "hover": "hover:from-purple-500/90 hover:to-blue-700/90",
+      "glass": "backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(30,58,138,0.4)]"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "Use high-end glass (backdrop-blur-xl) on header, sidebar, and bubbles. DO NOT use muddy gray transparency. Add a 1px inner stroke (border-white/10) to separate it from background.",
+    "buttons": "Translucent bubble aspect: highly rounded (pill-shaped), gradient purple to dark blue, white text, inner glow.",
+    "shadows": "Diffuse ambient shadows, never harsh drop shadows.",
+    "borders": "1px solid strokes or 2px 'Inner Glow' highlights for tactical minimalism."
+  },
+  "layouts": {
+    "general_strategy": "Responsive desktop-first with persistent Sidebar navigation. Use pure HTML + Tailwind CSS for major layout structures.",
+    "spacing": "Generous Spacing Philosophy. Use 2-3x more spacing (p-8, p-12) to prevent text collision.",
+    "admin_dashboard_grid": "High Density Grid. grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-6.",
+    "client_dashboard_grid": "Top Section: 3 Floating Bubbles (grid-cols-1 md:grid-cols-3 gap-8). Use 'aspect-square rounded-full' for the bubbles to make them perfect circles.",
+    "sidebar": "Fixed, glassy or solid dark blue background. Collapsible on mobile."
+  },
+  "motion": {
+    "client_bubbles": "Framer Motion applied to the 3 client widgets (Lucros/Despesas/Saldo). Add continuous floating animation: animate={{ y: [0, -10, 0] }}, transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}.",
+    "hover_states": "Buttons and cards must scale up slightly (scale-105) and increase shadow opacity.",
+    "page_transitions": "Smooth fade-in and slight upward slide for new pages."
+  },
+  "accessibility": {
+    "contrast": "Ensure minimum 4.5:1 ratio. Text inside bubble buttons must be white. ALWAYS explicitly set text color on hover (e.g., hover:bg-slate-900 hover:text-white).",
+    "data_testid": "MANDATORY: All interactive elements (buttons, links, form inputs) MUST include a kebab-case data-testid attribute.",
+    "focus": "Focus states must have higher contrast than default state."
+  },
+  "media": {
+    "icons": "lucide-react (as requested). Use for sidebar navigation and dashboard metrics.",
+    "images": [
+      {
+        "url": "https://images.pexels.com/photos/7518792/pexels-photo-7518792.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Sophisticated bar interior for the Login page background. Apply a dark overlay to ensure the login form pops.",
+        "category": "Login Background"
+      }
+    ]
+  },
+  "3d_libraries": {
+    "charts": "Recharts (BarChart, AreaChart, PieChart). Customize chart tooltips with glassmorphism and match the app's purple/blue palette.",
+    "motion": "Framer Motion for page transitions and the continuous floating animation of the client dashboard bubbles."
+  },
+  "component_name_and_path": {
+    "Sidebar": "/app/src/components/Sidebar.js",
+    "AdminDashboard": "/app/src/pages/admin/Dashboard.js",
+    "ClientDashboard": "/app/src/pages/client/Dashboard.js",
+    "DashboardBubble": "/app/src/components/DashboardBubble.js",
+    "Button": "/app/src/components/ui/button.js"
+  },
+  "instructions_to_main_agent": [
+    "Interface MUST be in Brazilian Portuguese (pt-BR).",
+    "Use Javascript (.js), DO NOT use Typescript (.tsx/.ts).",
+    "Login flow should distinguish between ADMIN and CLIENT.",
+    "For the Client Dashboard, create a dedicated 'DashboardBubble' component using Framer Motion (motion.div) that is 'aspect-square rounded-full flex flex-col justify-center items-center' and features the translucent purple-to-dark-blue gradient.",
+    "Admin Dashboard requires Recharts for statistics (AreaChart and PieChart).",
+    "Client Dashboard requires an 'Upload de comprovantes' area with OCR (simulate with drag & drop/camera UI).",
+    "Client panels have restrictions visually based on 'Básico/Profissional/Premium' plans.",
+    "DO NOT use pure complete transparent background on header, overlays, or any surface. ALWAYS use backdrop-blur and a slight opacity color (e.g., bg-black/60).",
+    "Use 'sonner' for toast notifications."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients (except for the requested purple-to-dark-blue bubbles).",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER use AI assistant Emoji characters like 🤖🧠💭 etc for icons. Use lucide-react.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "All interactive and key informational elements MUST include a data-testid attribute.",
+    "Components MUST use named exports (export const ComponentName = ...).",
+    "Pages MUST use default exports (export default function PageName() {...})."
+  ]
+}
