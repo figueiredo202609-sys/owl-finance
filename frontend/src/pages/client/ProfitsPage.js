@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from '@/components/Sidebar';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import { api, formatCurrency, formatDate } from '@/lib/api';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, TrendingUp, X } from 'lucide-react';
@@ -13,39 +14,63 @@ export default function ProfitsPage() {
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState({ value: '', date: '', name: '', description: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
-  const fetch = useCallback(() => {
+  const loadItems = useCallback(() => {
     setLoading(true);
-    api.get('/client/transactions?type=profit').then(r => setItems(r.data)).catch(() => toast.error('Erro ao carregar')).finally(() => setLoading(false));
+    api.get('/client/transactions?type=profit')
+      .then(r => setItems(r.data))
+      .catch(() => toast.error('Erro ao carregar lucros'))
+      .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => { loadItems(); }, [loadItems]);
 
-  const openCreate = () => { setForm({ value: '', date: new Date().toISOString().slice(0, 10), name: '', description: '' }); setSelected(null); setModal('create'); };
-  const openEdit = (item) => { setSelected(item); setForm({ value: String(item.value), date: item.date, name: item.name, description: item.description || '' }); setModal('edit'); };
+  const openCreate = () => {
+    setForm({ value: '', date: new Date().toISOString().slice(0, 10), name: '', description: '' });
+    setSelected(null);
+    setModal('create');
+  };
+
+  const openEdit = (item) => {
+    setSelected(item);
+    setForm({ value: String(item.value), date: item.date, name: item.name, description: item.description || '' });
+    setModal('edit');
+  };
+
   const closeModal = () => { setModal(null); setSelected(null); };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const payload = { type: 'profit', value: parseFloat(form.value), date: form.date, name: form.name, description: form.description };
       if (modal === 'create') {
-        await api.post('/client/transactions', payload);
+        await api.post('/client/transactions', { type: 'profit', value: parseFloat(form.value), date: form.date, name: form.name, description: form.description });
         toast.success('Lucro registrado!');
       } else {
         await api.put(`/client/transactions/${selected.id}`, { value: parseFloat(form.value), date: form.date, name: form.name, description: form.description });
         toast.success('Lucro atualizado!');
       }
-      fetch(); closeModal();
-    } catch (err) { toast.error(err.response?.data?.detail || 'Erro ao salvar'); }
-    finally { setSubmitting(false); }
+      loadItems();
+      closeModal();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Erro ao salvar');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = async (item) => {
-    if (!window.confirm('Remover este lucro?')) return;
-    try { await api.delete(`/client/transactions/${item.id}`); toast.success('Removido!'); fetch(); }
-    catch { toast.error('Erro ao remover'); }
+  const handleDeleteConfirm = async () => {
+    if (!confirmDelete) return;
+    try {
+      await api.delete(`/client/transactions/${confirmDelete.id}`);
+      toast.success('Lucro removido com sucesso!');
+      setConfirmDelete(null);
+      loadItems();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Erro ao remover');
+      setConfirmDelete(null);
+    }
   };
 
   const total = items.reduce((s, i) => s + i.value, 0);
@@ -65,7 +90,6 @@ export default function ProfitsPage() {
             </button>
           </div>
 
-          {/* Summary */}
           <div className="glass-card p-5 mb-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-emerald-600/20 flex items-center justify-center">
               <TrendingUp size={22} className="text-emerald-400" />
@@ -105,7 +129,7 @@ export default function ProfitsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
                           <button data-testid={`edit-profit-${item.id}`} onClick={() => openEdit(item)} className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-400/10 transition-colors"><Pencil size={15} /></button>
-                          <button data-testid={`delete-profit-${item.id}`} onClick={() => handleDelete(item)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors"><Trash2 size={15} /></button>
+                          <button data-testid={`delete-profit-${item.id}`} onClick={() => setConfirmDelete(item)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors"><Trash2 size={15} /></button>
                         </div>
                       </td>
                     </tr>
@@ -117,6 +141,7 @@ export default function ProfitsPage() {
         </div>
       </main>
 
+      {/* Edit / Create modal */}
       {modal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="glass-card w-full max-w-md p-6 relative" data-testid="profit-modal">
@@ -149,6 +174,16 @@ export default function ProfitsPage() {
           </div>
         </div>
       )}
+
+      {/* Delete confirmation */}
+      <ConfirmModal
+        open={!!confirmDelete}
+        title="Excluir lucro"
+        message={`Tem certeza que deseja excluir "${confirmDelete?.name}"? Esta ação não pode ser desfeita.`}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setConfirmDelete(null)}
+        confirmLabel="Excluir"
+      />
     </div>
   );
 }

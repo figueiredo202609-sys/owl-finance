@@ -2,7 +2,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, FileText, CreditCard, Upload,
-  TrendingUp, TrendingDown, History, User, LogOut, ChevronLeft, ChevronRight
+  TrendingUp, TrendingDown, History, User, LogOut,
+  ChevronLeft, ChevronRight, Sparkles
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -10,10 +11,10 @@ const adminLinks = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/clients', icon: Users, label: 'Clientes' },
   { to: '/admin/receipts', icon: FileText, label: 'Comprovantes' },
-  { to: '/admin/billing', icon: CreditCard, label: 'Cobranças' },
+  { to: '/admin/billing', icon: CreditCard, label: 'Planos' },
 ];
 
-const clientLinks = [
+const baseClientLinks = [
   { to: '/client/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/client/upload', icon: Upload, label: 'Upload Comprovante' },
   { to: '/client/profits', icon: TrendingUp, label: 'Lucros' },
@@ -22,17 +23,19 @@ const clientLinks = [
   { to: '/client/profile', icon: User, label: 'Perfil' },
 ];
 
+const premiumLink = { to: '/client/ai', icon: Sparkles, label: 'IA Premium', premium: true };
+
 export const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+
+  const isPremium = user?.plan_name === 'Premium';
+  const clientLinks = isPremium ? [...baseClientLinks, premiumLink] : baseClientLinks;
   const links = user?.role === 'admin' ? adminLinks : clientLinks;
   const initials = (user?.restaurant_name || user?.email || 'U').slice(0, 2).toUpperCase();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  const handleLogout = () => { logout(); navigate('/'); };
 
   return (
     <aside
@@ -62,13 +65,13 @@ export const Sidebar = () => {
 
       {/* Nav links */}
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {links.map(({ to, icon: Icon, label }) => (
+        {links.map(({ to, icon: Icon, label, premium }) => (
           <NavLink
             key={to}
             to={to}
             data-testid={`nav-${label.toLowerCase().replace(/\s+/g, '-')}`}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-150 group
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-150
               ${isActive
                 ? 'bg-gradient-to-r from-purple-600/30 to-blue-800/30 text-white border border-purple-500/30'
                 : 'text-slate-400 hover:bg-white/5 hover:text-white'
@@ -76,8 +79,17 @@ export const Sidebar = () => {
               ${collapsed ? 'justify-center' : ''}`
             }
           >
-            <Icon size={18} className="shrink-0" />
-            {!collapsed && <span className="text-sm font-medium">{label}</span>}
+            <Icon size={18} className={`shrink-0 ${premium ? 'text-purple-400' : ''}`} />
+            {!collapsed && (
+              <span className="text-sm font-medium flex items-center gap-2">
+                {label}
+                {premium && (
+                  <span className="text-[10px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded-full font-bold">
+                    PRO
+                  </span>
+                )}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

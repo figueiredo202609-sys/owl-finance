@@ -14,6 +14,7 @@ import ProfitsPage from '@/pages/client/ProfitsPage';
 import ExpensesPage from '@/pages/client/ExpensesPage';
 import HistoryPage from '@/pages/client/HistoryPage';
 import ProfilePage from '@/pages/client/ProfilePage';
+import AiInsightsPage from '@/pages/client/AiInsightsPage';
 
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useAuth();
@@ -43,6 +44,7 @@ const AppRoutes = () => {
       <Route path="/client/expenses" element={<ProtectedRoute role="client"><ExpensesPage /></ProtectedRoute>} />
       <Route path="/client/history" element={<ProtectedRoute role="client"><HistoryPage /></ProtectedRoute>} />
       <Route path="/client/profile" element={<ProtectedRoute role="client"><ProfilePage /></ProtectedRoute>} />
+      <Route path="/client/ai" element={<ProtectedRoute role="client"><AiInsightsPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -39,9 +39,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 PLANS = [
-    {"name": "Básico", "price": 49.90, "ocr": False, "history_days": 30, "export": False},
-    {"name": "Profissional", "price": 99.90, "ocr": True, "history_days": 90, "export": True},
-    {"name": "Premium", "price": 199.90, "ocr": True, "history_days": None, "export": True},
+    {"name": "Básico", "price": 69.90, "ocr": False, "history_days": 30, "export": False, "ai": False},
+    {"name": "Profissional", "price": 94.90, "ocr": True, "history_days": 90, "export": True, "ai": False},
+    {"name": "Premium", "price": 119.90, "ocr": True, "history_days": None, "export": True, "ai": True},
 ]
 
 
@@ -515,6 +515,79 @@ async def update_profile(req: ProfileUpdate, user=Depends(require_client)):
     if update:
         await db.users.update_one({"_id": user["_id"]}, {"$set": update})
     return {"message": "Perfil atualizado"}
+
+
+# ---- AI Insights (Premium only) ----
+class AiInsightsRequest(BaseModel):
+    question: str
+
+
+@api_router.post("/client/ai-insights")
+async def ai_insights(req: AiInsightsRequest, user=Depends(require_client)):
+    if user.get("plan_name") != "Premium":
+        raise HTTPException(status_code=403, detail="IA disponível apenas no plano Premium")
+
+    llm_key = os.environ.get("EMERGENT_LLM_KEY")
+    if not llm_key:
+        raise HTTPException(status_code=500, detail="Chave LLM não configurada")
+
+    client_id = str(user["_id"])
+    txs = await db.transactions.find({"client_id": client_id}).sort("date", -1).to_list(500)
+
+    profits = [t for t in txs if t["type"] == "profit"]
+    expenses = [t for t in txs if t["type"] == "expense"]
+    total_profit = sum(t["value"] for t in profits)
+    total_expense = sum(t["value"] for t in expenses)
+
+    monthly: dict = {}
+    for t in txs:
+        try:
+            m = t["date"][:7]
+            if m not in monthly:
+                monthly[m] = {"lucros": 0, "despesas": 0}
+            if t["type"] == "profit":
+                monthly[m]["lucros"] += t["value"]
+            else:
+                monthly[m]["despesas"] += t["value"]
+        except Exception:
+            pass
+
+    tx_list = [
+        {
+            "tipo": "Lucro" if t["type"] == "profit" else "Despesa",
+            "valor": t["value"],
+            "data": t.get("date", ""),
+            "nome": t.get("name", ""),
+            "descricao": t.get("description", ""),
+        }
+        for t in txs[:200]
+    ]
+
+    system_msg = (
+        f"Você é um consultor financeiro especializado em restaurantes. "
+        f"Analise os dados do restaurante \"{user.get('restaurant_name', 'N/A')}\" e responda em português brasileiro.\n\n"
+        f"RESUMO FINANCEIRO:\n"
+        f"- Total Lucros: R$ {total_profit:.2f}\n"
+        f"- Total Despesas: R$ {total_expense:.2f}\n"
+        f"- Saldo: R$ {total_profit - total_expense:.2f}\n"
+        f"- Total transações: {len(txs)}\n\n"
+        f"RESUMO MENSAL: {json.dumps(monthly, ensure_ascii=False)}\n\n"
+        f"TRANSAÇÕES DETALHADAS: {json.dumps(tx_list, ensure_ascii=False)}\n\n"
+        f"Responda de forma clara, objetiva e profissional. Use os dados reais para embasar as respostas. "
+        f"Formate valores monetários em Real (R$). Use listas quando necessário para clareza."
+    )
+
+    try:
+        chat = LlmChat(
+            api_key=llm_key,
+            session_id=str(uuid.uuid4()),
+            system_message=system_msg,
+        ).with_model("openai", "gpt-4o")
+        response = await chat.send_message(UserMessage(text=req.question))
+        return {"response": response}
+    except Exception as e:
+        logger.error(f"AI Insights error: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro ao processar IA: {str(e)}")
 
 
 # ---- App ----

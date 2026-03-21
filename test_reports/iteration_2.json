@@ -1,0 +1,49 @@
+{
+  "summary": "Full E2E re-testing iteration 2. All new features verified: plan prices, IA Premium, ConfirmModal, export buttons, sidebar PRO badge, permanent delete. 17/17 backend tests pass. All frontend flows confirmed working.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "GET /api/admin/stats",
+        "issue": "Uses hardcoded old plan prices (49.90/99.90/199.90) instead of updated prices (69.90/94.90/119.90) for monthly_revenue calculation. Prices don't match PLANS constant.",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "test_report_links": [
+    "/app/backend/tests/test_owl_finance_v2.py",
+    "/app/test_reports/pytest/pytest_results_v2.xml"
+  ],
+
+  "action_items": [
+    "MINOR: Fix admin stats monthly_revenue calculation - use PLANS constant prices instead of hardcoded old values: plan_prices = {p['name']: p['price'] for p in PLANS}"
+  ],
+
+  "critical_code_review_comments": [
+    "admin/stats uses hardcoded plan_prices = {'Basico': 49.90, 'Profissional': 99.90, 'Premium': 199.90} which does not match updated PLANS constant. Should derive from PLANS."
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_owl_finance_v2.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (17/17)",
+    "frontend": "100% - all flows verified: admin login/billing, premium client login, sidebar IA Premium PRO badge, 3 dashboard bubbles, ConfirmModal (cancel keeps item), HistoryPage PDF/Excel export buttons, AI Insights page with suggestions"
+  },
+
+  "seed_data_creation": "No new seed data created. owltest@test.com is Premium with 7 transactions intact.",
+
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+
+  "context_for_next_testing_agent": "All new features (iteration 2) working: plan prices R$69.90/94.90/119.90, IA Premium gated (403 for non-Premium), ConfirmModal with Cancelar/Excluir, permanent delete verified, export PDF/Excel visible for Premium/Pro (locked for Basic), AI page with suggestion chips. Only minor bug: admin stats uses wrong hardcoded plan prices for revenue calculation."
+}
