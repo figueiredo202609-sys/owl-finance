@@ -12,7 +12,7 @@ from pathlib import Path
 import uuid
 from datetime import datetime, timezone, timedelta
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt as _bcrypt
 import base64
 import io
 import json
@@ -33,7 +33,6 @@ SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'owl-finance-secret-key-2026')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 logging.basicConfig(level=logging.INFO)
@@ -47,11 +46,14 @@ PLANS = [
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return _bcrypt.hashpw(password.encode('utf-8'), _bcrypt.gensalt()).decode('utf-8')
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    try:
+        return _bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
+    except Exception:
+        return False
 
 
 def create_token(data: dict) -> str:
