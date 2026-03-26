@@ -50,6 +50,7 @@
 - [x] Sistema de Planos (Básico/Profissional/Premium) — restrições no backend E frontend
 - [x] Autenticação bcrypt direto (sem passlib) — hash seguro e consistente
 - [x] Design dark mode: fundo #020617, bolhas gradiente roxo-azul, fonte Manrope
+- [x] **MOBILE RESPONSIVO (Março 2026)**: Layout.js compartilhado, hamburger menu, sidebar overlay no mobile, padding responsivo em todas as páginas
 
 ## Backlog Priorizado
 
