@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Layout } from '@/components/Layout';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { api, formatCurrency, formatDate } from '@/lib/api';
 import { toast } from 'sonner';
@@ -76,9 +76,8 @@ export default function ProfitsPage() {
   const total = items.reduce((s, i) => s + i.value, 0);
 
   return (
-    <div className="flex h-screen bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto p-8 page-enter">
+    <Layout>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 page-enter">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -184,6 +183,6 @@ export default function ProfitsPage() {
         onCancel={() => setConfirmDelete(null)}
         confirmLabel="Excluir"
       />
-    </div>
+    </Layout>
   );
 }

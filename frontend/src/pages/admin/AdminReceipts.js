@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Layout } from '@/components/Layout';
 import { api, formatCurrency, formatDate } from '@/lib/api';
 import { ArrowUpRight, ArrowDownRight, Search } from 'lucide-react';
 
@@ -27,9 +27,8 @@ export default function AdminReceipts() {
   const totalExpense = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + t.value, 0);
 
   return (
-    <div className="flex h-screen bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto p-8 page-enter">
+    <Layout>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 page-enter">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <h1 className="text-white text-3xl font-black tracking-tight" style={{ fontFamily: 'Manrope' }}>Comprovantes</h1>
@@ -112,6 +111,6 @@ export default function AdminReceipts() {
           </div>
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }

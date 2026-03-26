@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Layout } from '@/components/Layout';
 import { api, formatCurrency } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sparkles, Send, Lock, ArrowRight, TrendingUp, TrendingDown, Scale, Lightbulb } from 'lucide-react';
@@ -74,8 +74,7 @@ export default function AiInsightsPage() {
 
   if (!isPremium) {
     return (
-      <div className="flex h-screen bg-[#020617]">
-        <Sidebar />
+      <Layout>
         <main className="flex-1 flex items-center justify-center p-8">
           <div className="glass-card p-10 max-w-md text-center" data-testid="premium-lock">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/30 to-blue-800/30 border border-purple-500/30 flex items-center justify-center mx-auto mb-6">
@@ -100,16 +99,15 @@ export default function AiInsightsPage() {
             </button>
           </div>
         </main>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[#020617]">
-      <Sidebar />
+    <Layout>
       <main className="flex-1 flex flex-col overflow-hidden page-enter">
         {/* Header */}
-        <div className="px-8 pt-8 pb-4 border-b border-white/8 shrink-0">
+        <div className="px-4 md:px-8 pt-4 md:pt-8 pb-4 border-b border-white/8 shrink-0">
           <div className="max-w-3xl mx-auto flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-800 flex items-center justify-center shadow-lg">
               <Sparkles size={22} className="text-white" />
@@ -127,7 +125,7 @@ export default function AiInsightsPage() {
         </div>
 
         {/* Suggestions */}
-        <div className="px-8 py-4 border-b border-white/5 shrink-0">
+        <div className="px-4 md:px-8 py-4 border-b border-white/5 shrink-0">
           <div className="max-w-3xl mx-auto">
             <p className="text-slate-500 text-xs mb-3 flex items-center gap-1.5">
               <Lightbulb size={12} /> Sugestões de perguntas
@@ -148,7 +146,7 @@ export default function AiInsightsPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-8 py-6">
+        <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6">
           <div className="max-w-3xl mx-auto">
             {messages.map((msg, i) => (
               <MessageBubble key={i} msg={msg} />
@@ -173,7 +171,7 @@ export default function AiInsightsPage() {
         </div>
 
         {/* Input bar */}
-        <div className="px-8 pb-8 pt-4 border-t border-white/8 shrink-0">
+        <div className="px-4 md:px-8 pb-4 md:pb-8 pt-4 border-t border-white/8 shrink-0">
           <div className="max-w-3xl mx-auto flex gap-3">
             <input
               data-testid="ai-input"
@@ -196,6 +194,6 @@ export default function AiInsightsPage() {
           </div>
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }

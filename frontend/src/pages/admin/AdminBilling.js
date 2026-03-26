@@ -1,4 +1,4 @@
-import { Sidebar } from '@/components/Sidebar';
+import { Layout } from '@/components/Layout';
 import { Check, X, Zap } from 'lucide-react';
 
 const plans = [
@@ -56,9 +56,8 @@ const plans = [
 
 export default function AdminBilling() {
   return (
-    <div className="flex h-screen bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto p-8 page-enter">
+    <Layout>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 page-enter">
         <div className="max-w-5xl mx-auto">
           <div className="mb-8">
             <h1 className="text-white text-3xl font-black tracking-tight" style={{ fontFamily: 'Manrope' }}>Cobranças</h1>
@@ -110,6 +109,6 @@ export default function AdminBilling() {
           </div>
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Layout } from '@/components/Layout';
 import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/api';
 import { Users, TrendingUp, CheckCircle, XCircle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
@@ -44,9 +44,8 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto p-8 page-enter">
+    <Layout>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 page-enter">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <h1 className="text-white text-3xl font-black tracking-tight" style={{ fontFamily: 'Manrope' }}>
@@ -151,6 +150,6 @@ export default function AdminDashboard() {
           )}
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }

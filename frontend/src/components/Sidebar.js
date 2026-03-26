@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, FileText, CreditCard, Upload,
   TrendingUp, TrendingDown, History, User, LogOut,
-  ChevronLeft, ChevronRight, Sparkles
+  ChevronLeft, ChevronRight, Sparkles, X
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -25,7 +25,7 @@ const baseClientLinks = [
 
 const premiumLink = { to: '/client/ai', icon: Sparkles, label: 'IA Premium', premium: true };
 
-export const Sidebar = () => {
+export const Sidebar = ({ onCloseMobile }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
@@ -43,14 +43,26 @@ export const Sidebar = () => {
       className={`flex flex-col h-screen bg-[#0A1128] border-r border-white/8 transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'} relative shrink-0`}
     >
       {/* Logo */}
-      <div className={`flex items-center gap-3 px-4 py-5 border-b border-white/8 ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-blue-800 flex items-center justify-center shrink-0">
-          <span className="text-white font-bold text-lg">O</span>
+      <div className={`flex items-center gap-3 px-4 py-5 border-b border-white/8 ${collapsed ? 'justify-center' : 'justify-between'}`}>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-blue-800 flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-lg">O</span>
+          </div>
+          {!collapsed && (
+            <span className="text-white font-bold text-xl tracking-tight" style={{ fontFamily: 'Manrope, sans-serif' }}>
+              Owl Finance
+            </span>
+          )}
         </div>
-        {!collapsed && (
-          <span className="text-white font-bold text-xl tracking-tight" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Owl Finance
-          </span>
+        {/* Close button - only on mobile */}
+        {onCloseMobile && !collapsed && (
+          <button
+            onClick={onCloseMobile}
+            className="md:hidden w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="Fechar menu"
+          >
+            <X size={16} />
+          </button>
         )}
       </div>
 

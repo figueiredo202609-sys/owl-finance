@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Layout } from '@/components/Layout';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Power, Search, X } from 'lucide-react';
@@ -84,11 +84,10 @@ export default function AdminClients() {
   );
 
   return (
-    <div className="flex h-screen bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto p-8 page-enter">
+    <Layout>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 page-enter">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
             <div>
               <h1 className="text-white text-3xl font-black tracking-tight" style={{ fontFamily: 'Manrope' }}>Clientes</h1>
               <p className="text-slate-400 mt-1">{clients.length} cliente(s) cadastrado(s)</p>
@@ -194,6 +193,6 @@ export default function AdminClients() {
           </div>
         </div>
       )}
-    </div>
+    </Layout>
   );
 }

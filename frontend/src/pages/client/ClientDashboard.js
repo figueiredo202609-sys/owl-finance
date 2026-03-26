@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Layout } from '@/components/Layout';
 import { DashboardBubble } from '@/components/DashboardBubble';
 import { api, formatCurrency } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,9 +34,8 @@ export default function ClientDashboard() {
   const isBasic = user?.plan_name === 'Básico';
 
   return (
-    <div className="flex h-screen bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto p-8 page-enter">
+    <Layout>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 page-enter">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex items-start justify-between mb-8">
@@ -143,6 +142,6 @@ export default function ClientDashboard() {
           )}
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }
